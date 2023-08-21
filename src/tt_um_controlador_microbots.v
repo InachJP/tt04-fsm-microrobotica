@@ -27,92 +27,92 @@ module tt_um_controlador_microbots#(
     assign motors[3] = motorB_d;
     assign reset = ~rst_n;
 
- reg [1:0] state, next_state;
+    reg [1:0] state, next_state;
 
-parameter Standby = 2'b00;
-parameter goforward = 2'b01;
-parameter goright = 2'b10;
-parameter goleft = 2'b11;
+    parameter Standby = 2'b00;
+    parameter goforward = 2'b01;
+    parameter goright = 2'b10;
+    parameter goleft = 2'b11;
 
-always @(posedge clk) begin
-    if (reset)
-        state <= Standby;
-    else
-        state <= next_state;
-end
+    always @(posedge clk) begin
+        if (reset)
+            state <= Standby;
+        else
+            state <= next_state;
+    end
 
-always @* begin
-    next_state = Standby;
-    case (state)
-        Standby: 
-            if (f_sensor == 0 && l_sensor == 0 && r_sensor == 0)
-            begin
-                next_state = goforward;
-            end
-            else if (f_sensor == 0 && l_sensor == 1 && r_sensor == 1)
-            begin
-                next_state = goforward;
-            end
-            else if (l_sensor == 1 && r_sensor == 0)
-            begin
-                next_state = goright;
-            end
-            else if (f_sensor == 1 && r_sensor == 0)
-            begin
-                next_state = goright;
-            end
-            else if (l_sensor == 0 && r_sensor == 1)
-            begin
-                next_state = goleft;
-            end
-        goforward: 
-            if (f_sensor == 0 && l_sensor == 0 && r_sensor == 0)
-            begin
-                next_state = state;
-            end
-            if (f_sensor == 0 && l_sensor == 1 && r_sensor == 1)
-            begin
-                next_state = state;
-            end
-        goright: 
-            if (l_sensor == 1 && r_sensor == 0)
-            begin
-                next_state = state;
-            end
-        goleft: 
-            if (l_sensor == 0 && r_sensor == 1)
-            begin
-                next_state = state;
-            end
-    endcase
-end
+    always @* begin
+        next_state = Standby;
+        case (state)
+            Standby: 
+                if (f_sensor == 0 && l_sensor == 0 && r_sensor == 0)
+                begin
+                    next_state = goforward;
+                end
+                else if (f_sensor == 0 && l_sensor == 1 && r_sensor == 1)
+                begin
+                    next_state = goforward;
+                end
+                else if (l_sensor == 1 && r_sensor == 0)
+                begin
+                    next_state = goright;
+                end
+                else if (f_sensor == 1 && r_sensor == 0)
+                begin
+                    next_state = goright;
+                end
+                else if (l_sensor == 0 && r_sensor == 1)
+                begin
+                    next_state = goleft;
+                end
+            goforward: 
+                if (f_sensor == 0 && l_sensor == 0 && r_sensor == 0)
+                begin
+                    next_state = state;
+                end
+                if (f_sensor == 0 && l_sensor == 1 && r_sensor == 1)
+                begin
+                    next_state = state;
+                end
+            goright: 
+                if (l_sensor == 1 && r_sensor == 0)
+                begin
+                    next_state = state;
+                end
+            goleft: 
+                if (l_sensor == 0 && r_sensor == 1)
+                begin
+                    next_state = state;
+                end
+        endcase
+    end
 
-always @* begin //se definen las polarizaciones de los motores 
-    case (state)
-        Standby : begin
-            motorB_i = 0;
-            motorB_d = 0;
-            motorA_i = 0;
-            motorA_d = 0;
-        end
-        goforward: begin
-            motorB_i = 0;
-            motorB_d = 1;
-            motorA_i = 0;
-            motorA_d = 1;
-        end
-        goright: begin
-            motorB_i = 1;
-            motorB_d = 0;
-            motorA_i = 0;
-            motorA_d = 1;
-        end
-        goleft: begin
-            motorB_i = 0;
-            motorB_d = 1;
-            motorA_i = 1;
-            motorA_d = 0;
-        end
-    endcase
-end
+    always @* begin //se definen las polarizaciones de los motores 
+        case (state)
+            Standby : begin
+                motorB_i = 0;
+                motorB_d = 0;
+                motorA_i = 0;
+                motorA_d = 0;
+            end
+            goforward: begin
+                motorB_i = 0;
+                motorB_d = 1;
+                motorA_i = 0;
+                motorA_d = 1;
+            end
+            goright: begin
+                motorB_i = 1;
+                motorB_d = 0;
+                motorA_i = 0;
+                motorA_d = 1;
+            end
+            goleft: begin
+                motorB_i = 0;
+                motorB_d = 1;
+                motorA_i = 1;
+                motorA_d = 0;
+            end
+        endcase
+    end
 endmodule
