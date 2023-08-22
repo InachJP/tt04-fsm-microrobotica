@@ -1,13 +1,8 @@
-`timescale 1ns / 1ps
 
-/*
-Universidad técnica Federico Santa María, Valparaíso
-Autor: Jonathan Pedraza & Lucas Irribarra
-*/
 
-module tt_um_controlador_microbots #(
-    input  wire [7:0] ui_in,    // Dedicated inputs
-    output wire [7:0] uo_out,   // Dedicated outputs
+module tt_um_controlador_microbots (
+    input  wire [2:0] ui_in,    // Dedicated inputs
+    output wire [3:0] uo_out,   // Dedicated outputs
     input  wire [7:0] uio_in,   // IOs: Input path
     output wire [7:0] uio_out,  // IOs: Output path
     output wire [7:0] uio_oe,   // IOs: Enable path (active high: 0=input, 1=output)
@@ -15,7 +10,8 @@ module tt_um_controlador_microbots #(
     input  wire       clk,      // clock
     input  wire       rst_n     // reset_n - low to reset
 );
-    wire reset, f_sensor, l_sensor, r_sensor, motorA_d, motorA_i, motorB_d, motorB_i;
+    wire reset, f_sensor, l_sensor, r_sensor;
+    reg motorA_d, motorA_i, motorB_d, motorB_i;
     wire [3:0] motors;
 
     assign uio_oe = 8'b1111_1111; //todos output
@@ -70,7 +66,7 @@ module tt_um_controlador_microbots #(
                 begin
                     next_state = state;
                 end
-                if (f_sensor == 0 && l_sensor == 1 && r_sensor == 1)
+                else if (f_sensor == 0 && l_sensor == 1 && r_sensor == 1)
                 begin
                     next_state = state;
                 end
