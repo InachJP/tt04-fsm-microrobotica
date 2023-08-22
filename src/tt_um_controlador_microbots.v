@@ -1,8 +1,8 @@
 
 
 module tt_um_controlador_microbots (
-    input  wire [2:0] ui_in,    // Dedicated inputs
-    output wire [3:0] uo_out,   // Dedicated outputs
+    input  wire [7:0] ui_in,    // Dedicated inputs
+    output wire [7:0] uo_out,   // Dedicated outputs
     input  wire [7:0] uio_in,   // IOs: Input path
     output wire [7:0] uio_out,  // IOs: Output path
     output wire [7:0] uio_oe,   // IOs: Enable path (active high: 0=input, 1=output)
@@ -10,13 +10,18 @@ module tt_um_controlador_microbots (
     input  wire       clk,      // clock
     input  wire       rst_n     // reset_n - low to reset
 );
-    wire reset, f_sensor, l_sensor, r_sensor;
+    wire reset;
+    wire f_sensor, l_sensor, r_sensor;
+    wire [4:0] data_in;
     reg motorA_d, motorA_i, motorB_d, motorB_i;
+    reg [3:0] flags;
     wire [3:0] motors;
 
     assign uio_oe = 8'b1111_1111; //todos output
-    assign {f_sensor, l_sensor, r_sensor} = ui_in;
-    assign uo_out = motors;
+    assign {data_in, f_sensor, l_sensor, r_sensor} = ui_in;
+
+
+    assign uo_out = {flags, motors};
     assign motors[0] = motorB_i;
     assign motors[1] = motorB_d;
     assign motors[2] = motorA_i;

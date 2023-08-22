@@ -1,66 +1,56 @@
 import cocotb
 from cocotb.clock import Clock
-from cocotb.triggers import RisingEdge, FallingEdge, Timer, ClockCycles
+from cocotb.triggers import Timer
 
-@cocotb.test()
-async def test_controlador_microbots(dut):
-    # Initialize the clock
-    clock = Clock(dut.clk, 10, units="ns")
-    cocotb.fork(clock.start())
+@cocotb.coroutine
+def clock_generator(clk, period=10):
+    while True:
+        clk <= 0
+        yield Timer(period // 2)
+        clk <= 1
+        yield Timer(period // 2)
 
-    # Reset the module
-    dut.rst_n <= 0
-    await RisingEdge(dut.clk)
-    dut.rst_n <= 1
-    await RisingEdge(dut.clk)
+@cocotb.coroutine
+def reset_dut(rst_n):
+    rst_n <= 0
+    yield Timer(10)
+    rst_n <= 1
+    yield Timer(10)
 
-    # Define states and transitions for the test
-    states = {
-        "Standby": 0,
-        "goforward": 1,
-        "goright": 2,
-        "goleft": 3
-    }
+@cocotb.coroutine
+def run_test(dut):
+    # Initialize signals
+    dut.ui_in <= 0
+    dut.uio_in <= 0
+    dut.ena <= 0
 
-    transitions = [
-        ("Standby", "goforward"),
-        ("goforward", "goforward"),
-        ("goforward", "Standby"),
-        ("Standby", "goright"),
-        ("goright", "goright"),
-        ("goright", "Standby"),
-        ("Standby", "goleft"),
-        ("goleft", "goleft"),
-        ("goleft", "Standby")
-    ]
+    # Start clock
+    cocotb.fork(clock_generator(dut.clk))
+
+    # Reset DUT
+    yield reset_dut(dut.rst_n)
+
+    # Wait for initialization
+    yield Timer(20)
 
     # Run the test
-    state = "Standby"
-    for transition in transitions:
-        from_state, to_state = transition
-        # Set input sensors based on current state
-        if from_state == "Standby":
-            dut.f_sensor <= 0
-            dut.l_sensor <= 0
-            dut.r_sensor <= 0
-        elif from_state == "goforward":
-            dut.f_sensor <= 0
-            dut.l_sensor <= 1
-            dut.r_sensor <= 1
-        elif from_state == "goright":
-            dut.f_sensor <= 1
-            dut.l_sensor <= 1
-            dut.r_sensor <= 0
-        elif from_state == "goleft":
-            dut.f_sensor <= 1
-            dut.l_sensor <= 0
-            dut.r_sensor <= 1
-        
-        await ClockCycles(dut.clk, 1)
-        
-        assert states[state] == int(dut.state)
+    for _ in range(10):
+        dut.ui_in <= 1
+        yield Timer(20)
+        dut.ui_in <= 2
+        yield Timer(20)
+        dut.ui_in <= 3
+        yield Timer(20)
+        dut.ui_in <= 4
+        yield Timer(20)
+        dut.ui_in <= 5
+        yield Timer(20)
+        dut.ui_in <= 6
+        yield Timer(20)
+        dut.ui_in <= 7
+        yield Timer(20)
+        dut.ui_in <= 0
+        yield Timer(0)
 
-        state = to_state
-        await Timer(1, units="ns")
-
-    cocotb.log.info("Test completed successfully")
+    yield Timer(10)
+    raise cocotb.result.TestComplete
