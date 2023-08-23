@@ -1,4 +1,4 @@
-
+`timescale 1ns / 1ps
 
 module tt_um_controlador_microbots (
     input  wire [7:0] ui_in,    // Dedicated inputs
@@ -17,18 +17,19 @@ module tt_um_controlador_microbots (
     reg [3:0] flags;
     wire [3:0] motors;
 
-    assign uio_oe = 8'b1111_1111; //todos output
+    //assign uio_oe = 8'b1111_1111; //todos output
     assign {data_in, f_sensor, l_sensor, r_sensor} = ui_in;
 
+    reg [1:0] state, next_state;
 
-    assign uo_out = {flags, motors};
+    assign uo_out = {motors, flags[3:0]};
     assign motors[0] = motorB_i;
     assign motors[1] = motorB_d;
     assign motors[2] = motorA_i;
     assign motors[3] = motorB_d;
     assign reset = ~rst_n;
 
-    reg [1:0] state, next_state;
+    
 
     parameter Standby = 2'b00;
     parameter goforward = 2'b01;
