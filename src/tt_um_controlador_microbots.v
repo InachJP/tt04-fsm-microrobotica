@@ -22,8 +22,10 @@ module tt_um_controlador_microbots (
 
     reg [1:0] state, next_state;
 
+    assign flags = 4'b0000;
     assign uo_out = {motors, flags[3:0]};
     assign uio_out = 8'b0000_0000;
+     
     
     assign motors[0] = motorB_i;
     assign motors[1] = motorB_d;
