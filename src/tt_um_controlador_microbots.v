@@ -17,12 +17,14 @@ module tt_um_controlador_microbots (
     reg [3:0] flags;
     wire [3:0] motors;
 
-    //assign uio_oe = 8'b1111_1111; //todos output
+    assign uio_oe = 8'b1111_1111; //todos output
     assign {data_in, f_sensor, l_sensor, r_sensor} = ui_in;
 
     reg [1:0] state, next_state;
 
     assign uo_out = {motors, flags[3:0]};
+    assign uio_out = 8'b0000_0000;
+    
     assign motors[0] = motorB_i;
     assign motors[1] = motorB_d;
     assign motors[2] = motorA_i;
@@ -46,7 +48,7 @@ module tt_um_controlador_microbots (
     always @* begin
         next_state = Standby;
         case (state)
-            Standby: 
+            Standby: begin 
                 if (f_sensor == 0 && l_sensor == 0 && r_sensor == 0)
                 begin
                     next_state = goforward;
@@ -67,7 +69,8 @@ module tt_um_controlador_microbots (
                 begin
                     next_state = goleft;
                 end
-            goforward: 
+            end
+            goforward: begin
                 if (f_sensor == 0 && l_sensor == 0 && r_sensor == 0)
                 begin
                     next_state = state;
@@ -76,16 +79,19 @@ module tt_um_controlador_microbots (
                 begin
                     next_state = state;
                 end
-            goright: 
+            end
+            goright: begin
                 if (l_sensor == 1 && r_sensor == 0)
                 begin
                     next_state = state;
                 end
-            goleft: 
+            end
+            goleft: begin
                 if (l_sensor == 0 && r_sensor == 1)
                 begin
                     next_state = state;
                 end
+            end
         endcase
     end
 
